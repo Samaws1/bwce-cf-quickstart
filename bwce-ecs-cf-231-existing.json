@@ -1,0 +1,846 @@
+{
+    "Description": "This template builds a base TIBCO BWCE docker image, creates an ECR repo with name 'tibco-bwce' and pushes base docker image into the ECR repo. It then leverages an existing VPC. \n",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [{
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "VPCCIDR",
+                        "PrivateSubnet1ID",
+                        "PrivateSubnet2ID",
+                        "PublicSubnet1ID",
+                        "PublicSubnet2ID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "ECS Cluster + Studio Configuration"
+                    },
+                    "Parameters": [
+                        "ClusterSize",
+                        "InstanceType",
+                        "VolSize",
+                        "InstanceTypeStudioImage",
+                        "VolSizeStudioImage",
+                        "KeyName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Base Image Customization Configuration"
+                    },
+                    "Parameters": [
+                        "ExtBucket",
+                        "ExtBucketName"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "KeyPairName": {
+                    "default": "SSH Key Name"
+                },
+                "PrivateSubnet1ID": {
+                    "default": "Private Subnet ID 1"
+                },
+                "PrivateSubnet2ID": {
+                    "default": "Private Subnet ID 2"
+                },
+                "PublicSubnet1ID": {
+                    "default": "Public Subnet ID 1"
+                },
+                "PublicSubnet2ID": {
+                    "default": "Public Subnet ID 2"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "VPCCIDR": {
+                    "default": "VPC CIDR"
+                },
+                "ClusterSize": {
+                    "default": "ECS Cluster Size:"
+                },
+                "InstanceType": {
+                    "default": "ECS Cluster Instance Type:"
+                },
+                "VolSize": {
+                    "default": "ECS Cluster Volume Size:"
+                },
+                "InstanceTypeStudioImage": {
+                    "default": "Studio EC2 Instance Type:"
+                },
+                "VolSizeStudioImage":{
+                    "default": "Studio EC2 Volume Size:"
+                },
+                "KeyName": {
+                    "default": "Key Pair:"
+                },
+                "ExtBucket": {
+                    "default": "Create S3 Bucket for Base Image Customization?"
+                },
+                "ExtBucketName": {
+                    "default": "S3 Bucket Name:"
+                }
+            }
+        }
+    },
+    "Parameters":{
+      "ClusterSize": {
+          "Description": "Number of EC2 instances to be created initially in the ECS Cluster (1-1000). This value will be used to set the Min, Max & Desired count of instances in the Auto Scaling Group.",
+          "Type": "Number",
+          "Default": 2,
+          "MaxValue": 1000,
+          "MinValue": 1,
+          "ConstraintDescription": "ClusterSize must be numeric and between 1 and 1000."
+      },
+      "InstanceType": {
+          "Description": "Select an instance type for EC2 instances to be created in the ECS cluster.",
+          "Type": "String",
+          "Default": "t2.medium",
+          "AllowedValues": [
+              "t2.micro",
+              "t2.small",
+              "t2.medium",
+              "t2.large",
+              "t2.xlarge",
+              "t2.2xlarge",
+              "m4.large",
+              "m4.xlarge",
+              "m4.2xlarge",
+              "m4.4xlarge",
+              "m4.10xlarge",
+              "m4.16xlarge",
+              "m3.medium",
+              "m3.large",
+              "m3.xlarge",
+              "m3.2xlarge",
+              "c4.large",
+              "c4.xlarge",
+              "c4.2xlarge",
+              "c4.4xlarge",
+              "c4.8xlarge",
+              "c3.large",
+              "c3.xlarge",
+              "c3.2xlarge",
+              "c3.4xlarge",
+              "c3.8xlarge",
+              "f1.2xlarge",
+              "f1.16xlarge",
+              "g3.4xlarge",
+              "g3.8xlarge",
+              "g3.16xlarge",
+              "g2.2xlarge",
+              "g2.8xlarge",
+              "p2.xlarge",
+              "p2.8xlarge",
+              "p2.16xlarge",
+              "r4.large",
+              "r4.xlarge",
+              "r4.2xlarge",
+              "r4.4xlarge",
+              "r4.8xlarge",
+              "r4.16xlarge",
+              "r3.large",
+              "r3.xlarge",
+              "r3.2xlarge",
+              "r3.4xlarge",
+              "r3.8xlarge",
+              "x1.16xlarge",
+              "x1.32xlarge",
+              "d2.xlarge",
+              "d2.2xlarge",
+              "d2.4xlarge",
+              "d2.8xlarge",
+              "i2.xlarge",
+              "i2.2xlarge",
+              "i2.4xlarge",
+              "i2.8xlarge",
+              "i3.large",
+              "i3.xlarge",
+              "i3.2xlarge",
+              "i3.4xlarge",
+              "i3.8xlarge",
+              "i3.16xlarge"
+          ],
+          "ConstraintDescription": "InstanceType must be a valid EC2 instance type."
+      },
+      "InstanceTypeStudioImage": {
+          "Description": "Select an instance type that runs your BusinessWorks Container Edition studio.",
+          "Type": "String",
+          "Default": "m3.large",
+          "AllowedValues":[
+            "t2.large",
+            "t2.xlarge",
+            "t2.2xlarge",
+            "m4.large",
+            "m4.xlarge",
+            "m4.2xlarge",
+            "m4.4xlarge",
+            "m4.10xlarge",
+            "m4.16xlarge",
+            "m3.medium",
+            "m3.large",
+            "m3.xlarge",
+            "m3.2xlarge"
+          ],
+          "ConstraintDescription": "InstanceTypeStudioImage must be a valid EC2 instance type."
+      },
+
+      "VolSize": {
+          "Description": "Volume Size (GB) for ECS cluster instances.",
+          "Type": "Number",
+          "Default": 30,
+          "MaxValue": 16384,
+          "MinValue": 30,
+          "ConstraintDescription": "VolumeSize must be numeric and between 30 and 16384."
+      },
+
+      "VolSizeStudioImage":{
+          "Description": "Volume Size  (GB) for EC2 instance running BusinessWorks Container Edition studio.",
+          "Type": "Number",
+          "Default": 40,
+          "MaxValue": 100,
+          "MinValue": 40,
+          "ConstraintDescription": "VolSizeStudioImage must be numeric and between 40 and 100."
+      },
+
+      "KeyName": {
+          "Description": "Select an existing key pair. You must provide existing key pair to be able to SSH into EC2 instances.",
+          "Type": "AWS::EC2::KeyPair::KeyName",
+          "MinLength": 1,
+          "MaxLength": 64,
+          "AllowedPattern": "[-_ a-zA-Z0-9]*",
+          "ConstraintDescription": "Must be the name of an existing key pair. It can contain only alphanumeric characters, spaces, dashes and underscores."
+      },
+      "ExtBucket": {
+          "Description": "Do you want to create a new S3 bucket & required folder structure for extending base image? You can upload third-party drivers, OSGI bundles, certificates, plugins etc. in this bucket to extend the base image later.",
+          "Type": "String",
+          "AllowedValues": [
+              "Yes",
+              "No"
+          ],
+          "Default": "No",
+          "ConstraintDescription": "The value should be Yes/No."
+      },
+      "ExtBucketName": {
+          "Description": "Prodive name for S3 bucket to be created, if you selected the previous option as 'Yes'.",
+          "Type": "String",
+          "MaxLength": 63,
+          "ConstraintDescription": "Must comply with AWS S3 bucket naming convention."
+      },
+      "KeyPairName": {
+          "Description": "Name of an existing EC2 key pair. All instances will launch with this key pair.",
+          "Type": "AWS::EC2::KeyPair::KeyName"
+      },
+      "PrivateSubnet1ID": {
+          "Description": "ID of private subnet 1 in Availability Zone 1 for the Workload (e.g., subnet-c0236ecd)",
+          "Type": "AWS::EC2::Subnet::Id"
+      },
+      "PrivateSubnet2ID": {
+          "Description": "ID of private subnet 2 in Availability Zone 2 for the Workload (e.g., subnet-bdf5347d)",
+          "Type": "AWS::EC2::Subnet::Id"
+      },
+      "PublicSubnet1ID": {
+          "Description": "ID of public subnet 1 in Availability Zone 1 for the ELB load balancer (e.g., subnet-0ba63bb)",
+          "Type": "AWS::EC2::Subnet::Id"
+      },
+      "PublicSubnet2ID": {
+          "Description": "ID of public subnet 2 in Availability Zone 2 for the ELB load balancer (e.g., subnet-e323d09)",
+          "Type": "AWS::EC2::Subnet::Id"
+      },
+      "VPCCIDR": {
+          "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+          "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+          "Default": "10.0.0.0/16",
+          "Description": "CIDR block for the VPC",
+          "Type": "String"
+      },
+      "VPCID": {
+          "Description": "ID of your existing VPC for deployment",
+          "Type": "AWS::EC2::VPC::Id"
+        }
+    },
+    "Conditions": {
+        "HasKeyName": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "KeyName"
+                        },
+                        ""
+                    ]
+                }
+            ]
+        },
+        "CreateS3Bucket": {
+            "Fn::Equals": [
+                {
+                    "Ref": "ExtBucket"
+                },
+                "Yes"
+            ]
+        },
+        "HasVolSize": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "VolSize"
+                        },
+                        ""
+                    ]
+                }
+            ]
+        },
+        "HasVolStudioSize": {
+            "Fn::Not":[
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "VolSizeStudioImage"
+                        },
+                        ""
+                    ]
+                }
+            ]
+        }
+    },
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [{
+                "Assert": {
+                    "Fn::EachMemberIn": [{
+                            "Fn::ValueOfAll": [
+                                "AWS::EC2::Subnet::Id",
+                                "VpcId"
+                            ]
+                        },
+                        {
+                            "Fn::RefAll": "AWS::EC2::VPC::Id"
+                        }
+                    ]
+                },
+                "AssertDescription": "All subnets must in the VPC"
+            }]
+        }
+    },
+    "Mappings": {
+        "AWSRegionToAMI": {
+            "us-east-1": {
+                "AMI": "ami-62f10318"
+            },
+            "us-east-2": {
+                "AMI": "ami-932a07f6"
+            },
+            "us-west-1": {
+                "AMI": "ami-69457509"
+            },
+            "us-west-2": {
+                "AMI": "ami-5f629b27"
+            },
+            "eu-west-1": {
+                "AMI": "ami-1d12d964"
+            },
+            "eu-west-2": {
+                "AMI": "ami-2b55474f"
+            },
+            "eu-central-1": {
+                "AMI": "ami-65b90a0a"
+            },
+            "ap-northeast-1": {
+                "AMI": "ami-4f8c5829"
+            },
+            "ap-southeast-1": {
+                "AMI": "ami-13770570"
+            },
+            "ap-southeast-2": {
+                "AMI": "ami-d6b252b4"
+            },
+            "ca-central-1": {
+                "AMI": "ami-c56cd5a1"
+            }
+        }
+    },
+    "Resources":{
+      "ECSHostSecurityGroup": {
+          "Type": "AWS::EC2::SecurityGroup",
+          "Properties": {
+              "VpcId": {
+                  "Ref": "VPC"
+              },
+              "GroupDescription": "Access to the ECS hosts and the tasks/containers that run on them",
+              "SecurityGroupIngress": [
+                  {
+                      "SourceSecurityGroupId": {
+                          "Ref": "LoadBalancerSecurityGroup"
+                      },
+                      "IpProtocol": -1
+                  }
+              ],
+              "Tags": [
+                  {
+                      "Key": "Name",
+                      "Value": {
+                          "Fn::Sub": "${AWS::StackName}-ECS-Hosts"
+                      }
+                  }
+              ]
+          }
+      },
+      "EC2SecurityGroup": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+            "VpcId": {
+                "Ref": "VPC"
+            },
+            "GroupDescription": "Base security group for EC2 BusinessWorks Container Edition Instance",
+            "SecurityGroupIngress": [
+                {
+                    "IpProtocol": "tcp",
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": "22",
+                    "ToPort": "22"
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": "5905",
+                    "ToPort": "5905"
+                }
+            ]
+        }
+      },
+      "LoadBalancerSecurityGroup": {
+          "Type": "AWS::EC2::SecurityGroup",
+          "Properties": {
+              "VpcId": {
+                  "Ref": "VPC"
+              },
+              "GroupDescription": "Access to the load balancer that sits in front of ECS",
+              "SecurityGroupIngress": [
+                  {
+                      "CidrIp": "0.0.0.0/0",
+                      "IpProtocol": -1
+                  }
+              ],
+              "Tags": [
+                  {
+                      "Key": "Name",
+                      "Value": {
+                          "Fn::Sub": "${AWS::StackName}-LoadBalancers"
+                      }
+                  }
+              ]
+          }
+      },
+      "DefaultTargetGroup": {
+          "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+          "Properties": {
+              "Name": {
+                  "Fn::Sub": "${AWS::StackName}-default"
+              },
+              "VpcId": {
+                  "Ref": "VPC"
+              },
+              "Port": 8080,
+              "Protocol": "HTTP"
+          }
+      },
+      "LoadBalancer": {
+          "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+          "Properties": {
+              "Name": {
+                  "Ref": "AWS::StackName"
+              },
+              "Subnets": [
+                  {
+                      "Ref": "PublicSubnet1"
+                  },
+                  {
+                      "Ref": "PublicSubnet2"
+                  }
+              ],
+              "SecurityGroups": [
+                  {
+                      "Ref": "LoadBalancerSecurityGroup"
+                  }
+              ],
+              "Tags": [
+                  {
+                      "Key": "Name",
+                      "Value": {
+                          "Ref": "AWS::StackName"
+                      }
+                  }
+              ]
+          }
+      },
+      "LoadBalancerListener": {
+          "Type": "AWS::ElasticLoadBalancingV2::Listener",
+          "Properties": {
+              "LoadBalancerArn": {
+                  "Ref": "LoadBalancer"
+              },
+              "Port": 8080,
+              "Protocol": "HTTP",
+              "DefaultActions": [
+                  {
+                      "Type": "forward",
+                      "TargetGroupArn": {
+                          "Ref": "DefaultTargetGroup"
+                      }
+                  }
+              ]
+          }
+      },
+      "FirstEC2Instance": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
+              "ImageId": {
+                  "Fn::FindInMap": [
+                      "AWSRegionToAMI",
+                      {
+                          "Ref": "AWS::Region"
+                      },
+                      "AMI"
+                  ]
+              },
+              "InstanceType": "t2.medium",
+              "KeyName": {
+                  "Fn::If": [
+                      "HasKeyName",
+                      {
+                          "Ref": "KeyName"
+                      },
+                      {
+                          "Ref": "AWS::NoValue"
+                      }
+                  ]
+              },
+              "IamInstanceProfile": {
+                  "Ref": "ECSInstanceProfile"
+              },
+              "InstanceInitiatedShutdownBehavior": "terminate",
+              "SecurityGroupIds": [
+                  {
+                      "Fn::GetAtt": [
+                          "VPC",
+                          "DefaultSecurityGroup"
+                      ]
+                  }
+              ],
+              "SubnetId": {
+                  "Ref": "PublicSubnet1"
+              },
+              "UserData": {
+                  "Fn::Base64": {
+                      "Fn::Sub": "#!/bin/bash\necho 'BWCE-AWS: Start of EC2 Instance UserData execution...'\nexport PATH=/home/ec2-user/.local/bin:$PATH\nexport PYTHONPATH=$PYTHONPATH:/home/ec2-user/.local/lib/python2.7/site-packages\n$( aws ecr get-login --region ${AWS::Region} --no-include-email )\nchmod +x /home/ec2-user/bwce/bwce-docker/createDockerImage.sh\ncd /home/ec2-user/bwce/bwce-docker/\nrm -f /home/ec2-user/bwce/bwce-docker/resources/bwce-runtime/bwceruntime-aws-2.3.1.zip\n./createDockerImage.sh /home/ec2-user/bwce/bwce-runtime/bwceruntime-aws-2.3.1.zip tibco/bwce:2.3.1\nif aws ecr describe-repositories --region ${AWS::Region} --repository-names tibco-bwce | grep repositoryUri; then\n    echo 'BWCE-AWS: Repository already exists, skipping repository creation...'\nelse \n    aws ecr create-repository --region ${AWS::Region} --repository-name tibco-bwce\nfi\ndocker tag tibco/bwce:2.3.1 ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/tibco-bwce:2.3.1\ndocker push ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/tibco-bwce:2.3.1\nif [ ${ExtBucket} == 'Yes' ]; then\n    if aws s3api get-bucket-location --bucket ${ExtBucketName} | grep LocationConstraint; then\n        echo 'BWCE-AWS: S3 Bucket already exists, skipping bucket creation...'\n    else \n        aws s3api create-bucket --bucket ${ExtBucketName} --region ${AWS::Region}\n    fi\n    aws s3api put-object --bucket ${ExtBucketName} --key certs/\n    aws s3api put-object --bucket ${ExtBucketName} --key jars/\n    aws s3api put-object --bucket ${ExtBucketName} --key lib/\n    aws s3api put-object --bucket ${ExtBucketName} --key monitor-agents/\n    aws s3api put-object --bucket ${ExtBucketName} --key plugins/\n    aws s3api put-object --bucket ${ExtBucketName} --key thirdparty-installs/\nfi\necho 'BWCE-AWS: End of EC2 Instance UserData execution, shutting down...'\nsudo poweroff\n"
+                  }
+              }
+          }
+      },
+      "StudioEC2Instance": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
+              "ImageId": {
+                  "Fn::FindInMap": [
+                      "AWSRegionToAMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMI"
+                  ]
+              },
+              "InstanceType": {
+                  "Ref": "InstanceTypeStudioImage"
+              },
+              "KeyName": {
+                  "Fn::If": [
+                      "HasKeyName",
+                      {
+                          "Ref": "KeyName"
+                      },
+                      {
+                          "Ref": "AWS::NoValue"
+                      }
+                  ]
+              },
+              "SecurityGroupIds": [
+                  {
+                      "Ref": "EC2SecurityGroup"
+                  }
+              ],
+              "SubnetId": {
+                  "Ref": "PublicSubnet1"
+              },
+              "Tags": [
+                 {
+                  "Key": "Name",
+                  "Value": {
+                      "Fn::Sub": "${AWS::StackName} - BWCE Studio"
+                           }
+                       }
+                   ],
+
+              "UserData": {
+                  "Fn::Base64": {
+                      "Fn::Sub": "#!/bin/bash\nyum update -y\nyum groupinstall -y 'GNOME Desktop' 'Graphical Administration Tools'\nyum install -y tigervnc-server xorg-x11-fonts-Type1\ncp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@:5.service\nsed -i -e 's/<USER>/ec2-user/g' /etc/systemd/system/vncserver@:5.service\nmkdir '/home/ec2-user/bwce/bwce-studio'\nmkdir '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nunzip '/home/ec2-user/bwce/installers/bwce/TIB_bwce_2.3.1_linux26gl23_x86_64.zip' -d '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nsed -i -e 's/\/opt\/tibco\/bwce/\/home\/ec2-user\/bwce\/bwce-studio/' /home/ec2-user/bwce/installers/bwce/BWCE-install/TIBCOUniversalInstaller_bwce_2.3.1.silent\ncd /home/ec2-user/bwce/installers/bwce/BWCE-install\n./TIBCOUniversalInstaller-lnx-x86-64.bin -silent\nmkdir -p '/home/ec2-user/.vnc'\nchmod 777 '/home/ec2-user/.vnc'\nrunuser -l ec2-user -c 'vncpasswd -f <<<${AWS::StackName} > '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'chmod 600 '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'vncserver'\nsystemctl daemon-reload\nsystemctl start vncserver@:5.service\nsystemctl enable vncserver@:5.service"
+                  }
+              }
+          }
+      },
+
+      "ECSCluster": {
+          "Type": "AWS::ECS::Cluster",
+          "Properties": {
+              "ClusterName": {
+                  "Ref": "AWS::StackName"
+              }
+          }
+      },
+      "ECSAutoScalingGroup": {
+          "Type": "AWS::AutoScaling::AutoScalingGroup",
+          "Properties": {
+              "VPCZoneIdentifier": [
+                  {
+                      "Ref": "PrivateSubnet1"
+                  },
+                  {
+                      "Ref": "PrivateSubnet2"
+                  }
+              ],
+              "LaunchConfigurationName": {
+                  "Ref": "ECSLaunchConfiguration"
+              },
+              "MinSize": {
+                  "Ref": "ClusterSize"
+              },
+              "MaxSize": {
+                  "Ref": "ClusterSize"
+              },
+              "DesiredCapacity": {
+                  "Ref": "ClusterSize"
+              },
+              "Tags": [
+                  {
+                      "Key": "Name",
+                      "Value": {
+                          "Fn::Sub": "${AWS::StackName} ECS host"
+                      },
+                      "PropagateAtLaunch": true
+                  }
+              ]
+          },
+          "CreationPolicy": {
+              "ResourceSignal": {
+                  "Timeout": "PT15M"
+              }
+          },
+          "UpdatePolicy": {
+              "AutoScalingRollingUpdate": {
+                  "MinInstancesInService": 1,
+                  "MaxBatchSize": 1,
+                  "PauseTime": "PT15M",
+                  "WaitOnResourceSignals": true
+              }
+          }
+      },
+      "ECSLaunchConfiguration": {
+          "Type": "AWS::AutoScaling::LaunchConfiguration",
+          "DependsOn": "InternetGatewayAttachment",
+          "Properties": {
+              "ImageId": {
+                  "Fn::FindInMap": [
+                      "AWSRegionToAMI",
+                      {
+                          "Ref": "AWS::Region"
+                      },
+                      "AMI"
+                  ]
+              },
+              "InstanceType": {
+                  "Ref": "InstanceType"
+              },
+              "KeyName": {
+                  "Fn::If": [
+                      "HasKeyName",
+                      {
+                          "Ref": "KeyName"
+                      },
+                      {
+                          "Ref": "AWS::NoValue"
+                      }
+                  ]
+              },
+              "BlockDeviceMappings": [
+                  {
+                      "DeviceName": "/dev/sda1",
+                      "Ebs": {
+                          "DeleteOnTermination": false,
+                          "VolumeType": "gp2",
+                          "VolumeSize": {
+                              "Fn::If": [
+                                  "HasVolSize",
+                                  {
+                                      "Ref": "VolSize"
+                                  },
+                                  30
+                              ]
+                          }
+                      }
+                  }
+              ],
+              "AssociatePublicIpAddress": true,
+              "SecurityGroups": [
+                  {
+                      "Ref": "ECSHostSecurityGroup"
+                  }
+              ],
+              "IamInstanceProfile": {
+                  "Ref": "ECSInstanceProfile"
+              },
+              "UserData": {
+                  "Fn::Base64": {
+                      "Fn::Sub": "#!/bin/bash\necho ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config\necho ECS_CHECKPOINT=false >> /etc/ecs/ecs.config\necho ECS_ENGINE_TASK_CLEANUP_WAIT_DURATION=8m >> /etc/ecs/ecs.config\necho ECS_DISABLE_IMAGE_CLEANUP=false >> /etc/ecs/ecs.config\necho ECS_IMAGE_CLEANUP_INTERVAL=15m >> /etc/ecs/ecs.config\necho ECS_IMAGE_MINIMUM_CLEANUP_AGE=1h >> /etc/ecs/ecs.config\necho ECS_NUM_IMAGES_DELETE_PER_CYCLE=5 >> /etc/ecs/ecs.config\nsudo systemctl enable docker-container@ecs-agent.service\nsudo systemctl start docker-container@ecs-agent.service\n/opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSLaunchConfiguration\n/opt/aws/bin/cfn-signal -e $? --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSAutoScalingGroup\nexport PATH=/home/ec2-user/.local/bin:$PATH\nexport PYTHONPATH=$PYTHONPATH:/home/ec2-user/.local/lib/python2.7/site-packages\n$( aws ecr get-login --region ${AWS::Region} --no-include-email )\n"
+                    }
+                 }
+              }
+          },
+          "Metadata": {
+              "AWS::CloudFormation::Init": {
+                  "config": {
+                      "commands": {
+                          "01_add_instance_to_cluster": {
+                              "command": {
+                                  "Fn::Sub": "echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config"
+                              }
+                          },
+                          "02_add_instance_to_cluster": {
+                              "command": "echo ECS_CHECKPOINT=false >> /etc/ecs/ecs.config"
+                          },
+                          "03_add_instance_to_cluster": {
+                              "command": "echo ECS_ENGINE_TASK_CLEANUP_WAIT_DURATION=10m >> /etc/ecs/ecs.config"
+                          },
+                          "04_add_instance_to_cluster": {
+                              "command": "echo ECS_DISABLE_IMAGE_CLEANUP=false >> /etc/ecs/ecs.config"
+                          }
+                      },
+                      "files": {
+                          "/etc/cfn/cfn-hup.conf": {
+                              "mode": 256,
+                              "owner": "root",
+                              "group": "root",
+                              "content": {
+                                  "Fn::Sub": "[main]\nstack=${AWS::StackId}\nregion=${AWS::Region}\n"
+                              }
+                          },
+                          "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                              "content": {
+                                  "Fn::Sub": "[cfn-auto-reloader-hook]\ntriggers=post.update\npath=Resources.ContainerInstances.Metadata.AWS::CloudFormation::Init\naction=/opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSLaunchConfiguration\n"
+                              }
+                          }
+                      },
+                      "services": {
+                          "sysvinit": {
+                              "cfn-hup": {
+                                  "enabled": true,
+                                  "ensureRunning": true,
+                                  "files": [
+                                      "/etc/cfn/cfn-hup.conf",
+                                      "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                                  ]
+                              }
+                          }
+                      }
+                  }
+              }
+          },
+          "ECSRole": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                  "Path": "/",
+                  "RoleName": {
+                      "Fn::Sub": "${AWS::StackName}-ECSRole-${AWS::Region}"
+                  },
+                  "AssumeRolePolicyDocument": "{\n    \"Statement\": [{\n        \"Action\": \"sts:AssumeRole\",\n        \"Effect\": \"Allow\",\n        \"Principal\": { \n            \"Service\": \"ec2.amazonaws.com\" \n        }\n    }]\n}\n",
+                  "Policies": [
+                      {
+                          "PolicyName": "ecs-service",
+                          "PolicyDocument": "{\n    \"Statement\": [{\n        \"Effect\": \"Allow\",\n        \"Action\": [\n            \"ecs:*\",\n            \"ecs:DeregisterContainerInstance\",\n            \"ecs:DiscoverPollEndpoint\",\n            \"ecs:Poll\",\n            \"ecs:RegisterContainerInstance\",\n            \"ecs:StartTelemetrySession\",\n            \"ecs:UpdateContainerInstancesState\",\n            \"ecs:Submit*\",\n            \"aws-marketplace:MeterUsage\",\n            \"ec2:AuthorizeSecurityGroupIngress\",\n            \"ec2:Describe*\",\n            \"elasticloadbalancing:DeregisterInstancesFromLoadBalancer\",\n            \"elasticloadbalancing:DeregisterTargets\",\n            \"elasticloadbalancing:Describe*\",\n            \"elasticloadbalancing:RegisterInstancesWithLoadBalancer\",\n            \"elasticloadbalancing:RegisterTargets\",\n            \"ecr:*\",\n            \"s3:*\",\n            \"logs:*\"\n        ],\n        \"Resource\": \"*\"\n    }]\n}\n"
+                      }
+                  ]
+              }
+          },
+          "ECSInstanceProfile": {
+              "Type": "AWS::IAM::InstanceProfile",
+              "Properties": {
+                  "Path": "/",
+                  "Roles": [
+                      {
+                          "Ref": "ECSRole"
+                      }
+                  ]
+              }
+          }
+      },
+      "Outputs": {
+          "VPC": {
+              "Description": "A reference to the VPC.",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/vpc/home?region=${AWS::Region}#vpcs:filter=${AWS::StackName}"
+              }
+          },
+          "LoadBalancer": {
+              "Description": "A reference to the Application Load Balancer.",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#LoadBalancers:search=${AWS::StackName}"
+              }
+          },
+          "DefaultTargetGroup": {
+              "Description": "A reference to the default Target Group for Application Load Balancer.",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#TargetGroups:search=${AWS::StackName}-default"
+              }
+          },
+          "EC2Instance": {
+              "Description": "A reference to the EC2 Instance",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:sort=instanceState"
+              }
+          },
+          "AutoScalingGroup": {
+              "Description": "A reference to the Auto Scaling Group.",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ec2/autoscaling/home?region=${AWS::Region}#AutoScalingGroups:id=${ECSAutoScalingGroup}"
+              }
+          },
+          "ECSCluster": {
+              "Description": "A reference to the ECS cluster.",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ecs/home?region=${AWS::Region}#/clusters/${ECSCluster}/services"
+              }
+          },
+          "ECR": {
+              "Description": "A reference to the Amazon ECR (Amazon EC2 Container Registry).",
+              "Value": {
+                  "Fn::Sub": "https://console.aws.amazon.com/ecs/home?region=${AWS::Region}#/repositories/tibco-bwce#images"
+              }
+          },
+          "S3Bucket": {
+              "Description": "A reference to the S3 Bucket which will be used for customizing base image. If you selected 'Create S3 Bucket for Base Image Customization?' as 'No', then it will not be applicable.",
+              "Value": {
+                  "Fn::If": [
+                      "CreateS3Bucket",
+                      {
+                          "Fn::Sub": "https://console.aws.amazon.com/s3/home?region=${AWS::Region}&bucket=${ExtBucketName}"
+                      },
+                      "Not Applicable"
+                  ]
+              }
+          }
+      }
+}
