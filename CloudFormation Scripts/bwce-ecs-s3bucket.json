@@ -177,10 +177,10 @@
                         "default": "Base Image Customization Configuration"
                     },
                     "Parameters": [
-                        "ExtBucket",
-                        "ExtBucketName",
+                        "EcrRepoName",
                         "PluginList",
-                        "EcrRepoName"
+                        "ExtBucket",
+                        "ExtBucketName"
                     ]
                 }
             ],
@@ -837,7 +837,7 @@
 
                 "UserData": {
                     "Fn::Base64": {
-                        "Fn::Sub": "#!/bin/bash\nyum update -y\nyum groupinstall -y 'GNOME Desktop' 'Graphical Administration Tools'\nyum install -y tigervnc-server xorg-x11-fonts-Type1\ncp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@:5.service\nsed -i -e 's/<USER>/ec2-user/g' /etc/systemd/system/vncserver@:5.service\nmkdir '/home/ec2-user/bwce/bwce-studio'\nmkdir '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nunzip '/home/ec2-user/bwce/installers/bwce/TIB_bwce_2.3.1_linux26gl23_x86_64.zip' -d '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nsed -i -e 's/\/opt\/tibco\/bwce/\/home\/ec2-user\/bwce\/bwce-studio/g' /home/ec2-user/bwce/installers/bwce/BWCE-install/TIBCOUniversalInstaller_bwce_2.3.1.silent\ncd /home/ec2-user/bwce/installers/bwce/BWCE-install\n./TIBCOUniversalInstaller-lnx-x86-64.bin -silent\nmkdir -p '/home/ec2-user/.vnc'\nchmod 777 '/home/ec2-user/.vnc'\nrunuser -l ec2-user -c 'vncpasswd -f <<<${AWS::StackName} > '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'chmod 600 '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'vncserver'\nsystemctl daemon-reload\nsystemctl start vncserver@:5.service\nsystemctl enable vncserver@:5.service"
+                        "Fn::Sub": "#!/bin/bash\nyum update -y\nyum groupinstall -y 'GNOME Desktop' 'Graphical Administration Tools'\nyum install -y tigervnc-server xorg-x11-fonts-Type1\ncp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@:5.service\nsed -i -e 's/<USER>/ec2-user/g' /etc/systemd/system/vncserver@:5.service\nmkdir '/home/ec2-user/bwce/bwce-studio'\nchmod 755 '/home/ec2-user/bwce/bwce-studio' \nmkdir '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nunzip '/home/ec2-user/bwce/installers/bwce/TIB_bwce_2.3.1_linux26gl23_x86_64.zip' -d '/home/ec2-user/bwce/installers/bwce/BWCE-install'\nsed -i -e 's#\/opt\/tibco\/bwce#\/home\/ec2-user\/bwce\/bwce-studio#g' /home/ec2-user/bwce/installers/bwce/BWCE-install/TIBCOUniversalInstaller_bwce_2.3.1.silent\ncd /home/ec2-user/bwce/installers/bwce/BWCE-install\n./TIBCOUniversalInstaller-lnx-x86-64.bin -silent\nmkdir -p '/home/ec2-user/.vnc'\nchmod 777 '/home/ec2-user/.vnc'\nrunuser -l ec2-user -c 'vncpasswd -f <<<${AWS::StackName} > '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'chmod 600 '/home/ec2-user/.vnc/passwd''\nrunuser -l ec2-user -c 'vncserver'\nsystemctl daemon-reload\nsystemctl start vncserver@:5.service\nsystemctl enable vncserver@:5.service"
                     }
                 }
             }
