@@ -33,6 +33,8 @@
                         "default": "Base Image Customization Configuration"
                     },
                     "Parameters": [
+                        "EcrRepoName",
+                        "PluginList",
                         "ExtBucket",
                         "ExtBucketName"
                     ]
@@ -83,6 +85,12 @@
                 },
                 "ExtBucketName": {
                     "default": "S3 Bucket Name:"
+                },
+                "PluginList": {
+                    "default": "List of Plug-ins:"
+                },
+                "EcrRepoName": {
+                    "default": "ECR Repo Name"
                 }
             }
         }
@@ -230,6 +238,17 @@
           "Type": "String",
           "MaxLength": 63,
           "ConstraintDescription": "Must comply with AWS S3 bucket naming convention."
+      },
+      "PluginList": {
+          "Description": "Provide list of IDs of supported Plug-ins to be added in the customized image, e.g. for including Data Conversion, MongoDB and S3 plug-ins, provide the value as 'DC,MongoDB,S3'. This list should be comma separated and should not include any space inbetween. The list of supported Plug-ins are - AMQP (Plug-in for AMQP), DC (Plug-in for Data Conversion), DCRM (Plug-in for Microsoft Dynamics CRM), Kafka (Plug-in for Apache Kafka), MongoDB (Plug-in for MongoDB), MQ (Plug-in for WebSphere MQ), OData (Plug-in for OData), S3 (Plug-in for Amazon S3), ServiceNow (Plug-in for ServiceNow), SFDC (Plug-in for Salesforce.com).",
+          "Type": "String"
+      },
+      "EcrRepoName": {
+          "Description": "Name of EC2 Container Registry (ECR) to be created to store customized image. This image will have the plugins you selected installed within it.",
+          "Type": "String",
+          "MinLength": 4,
+          "MaxLength": 64,
+          "ConstraintDescription": "EcrRepoName parameter is mandatory."
       },
       "KeyPairName": {
           "Description": "Name of an existing EC2 key pair. All instances will launch with this key pair.",
@@ -538,7 +557,7 @@
               },
               "UserData": {
                   "Fn::Base64": {
-                      "Fn::Sub": "#!/bin/bash\necho 'BWCE-AWS: Start of EC2 Instance UserData execution...'\nexport PATH=/home/ec2-user/.local/bin:$PATH\nexport PYTHONPATH=$PYTHONPATH:/home/ec2-user/.local/lib/python2.7/site-packages\n$( aws ecr get-login --region ${AWS::Region} --no-include-email )\nchmod +x /home/ec2-user/bwce/bwce-docker/createDockerImage.sh\ncd /home/ec2-user/bwce/bwce-docker/\nrm -f /home/ec2-user/bwce/bwce-docker/resources/bwce-runtime/bwceruntime-aws-2.3.1.zip\n./createDockerImage.sh /home/ec2-user/bwce/bwce-runtime/bwceruntime-aws-2.3.1.zip tibco/bwce:2.3.1\nif aws ecr describe-repositories --region ${AWS::Region} --repository-names tibco-bwce | grep repositoryUri; then\n    echo 'BWCE-AWS: Repository already exists, skipping repository creation...'\nelse \n    aws ecr create-repository --region ${AWS::Region} --repository-name tibco-bwce\nfi\ndocker tag tibco/bwce:2.3.1 ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/tibco-bwce:2.3.1\ndocker push ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/tibco-bwce:2.3.1\nif [ ${ExtBucket} == 'Yes' ]; then\n    if aws s3api get-bucket-location --bucket ${ExtBucketName} | grep LocationConstraint; then\n        echo 'BWCE-AWS: S3 Bucket already exists, skipping bucket creation...'\n    else \n        aws s3api create-bucket --bucket ${ExtBucketName} --region ${AWS::Region}\n    fi\n    aws s3api put-object --bucket ${ExtBucketName} --key certs/\n    aws s3api put-object --bucket ${ExtBucketName} --key jars/\n    aws s3api put-object --bucket ${ExtBucketName} --key lib/\n    aws s3api put-object --bucket ${ExtBucketName} --key monitor-agents/\n    aws s3api put-object --bucket ${ExtBucketName} --key plugins/\n    aws s3api put-object --bucket ${ExtBucketName} --key thirdparty-installs/\nfi\necho 'BWCE-AWS: End of EC2 Instance UserData execution, shutting down...'\nsudo poweroff\n"
+                      "Fn::Sub": "#!/bin/bash\necho 'BWCE-AWS: Start of EC2 Instance UserData execution...'\nexport PATH=/home/ec2-user/.local/bin:$PATH\nexport PYTHONPATH=$PYTHONPATH:/home/ec2-user/.local/lib/python2.7/site-packages\npluginListName=${PluginList}\nif [[ -n \"$pluginListName\" ]]; then\n    echo 'BWCE-AWS: Provided List of Plug-ins... ' ${PluginList}\n    for pluginName in $(echo ${PluginList} | tr ',' '\\n')\n    do\n        if [ $pluginName == 'DC' ]; then\n            echo 'BWCE-AWS: Copying DC Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/DC/TIB_bwdcp_4.5.1_v4.1_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwdcp_4.5.1_v4.1_bwce-runtime.zip || true\n        elif [ $pluginName == 'DCRM' ]; then\n            echo 'BWCE-AWS: Copying DCRM Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/DCRM/TIB_bwplugindynamicscrm_6.4.0_v14_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwplugindynamicscrm_6.4.0_v14_bwce-runtime.zip || true\n        elif [ $pluginName == 'MongoDB' ]; then\n            echo 'BWCE-AWS: Copying MongoDB Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/MongoDB/TIB_bwpluginmongodb_6.1.1_v1.5_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginmongodb_6.1.1_v1.5_bwce-runtime.zip || true\n        elif [ $pluginName == 'SFDC' ]; then\n            echo 'BWCE-AWS: Copying SFDC Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/SFDC/TIB_bwpluginsalesforce_6.2.1_v1.3_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginsalesforce_6.2.1_v1.3_bwce-runtime.zip || true\n        elif [ $pluginName == 'ServiceNow' ]; then\n            echo 'BWCE-AWS: Copying ServiceNow Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/ServiceNow/TIB_bwpluginservicenow_6.0.0_v19.0.2_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginservicenow_6.0.0_v19.0.2_bwce-runtime.zip || true\n        elif [ $pluginName == 'MQ' ]; then\n            echo 'BWCE-AWS: Copying MQ Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/MQ/TIB_bwmq_8.5.1_v4.2_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwmq_8.5.1_v4.2_bwce-runtime.zip || true\n        elif [ $pluginName == 'OData' ]; then\n            echo 'BWCE-AWS: Copying OData Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/OData/TIB_bwpluginodata_6.0.1_v3.1_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginodata_6.0.1_v3.1_bwce-runtime.zip || true\n        elif [ $pluginName == 'AMQP' ]; then\n            echo 'BWCE-AWS: Copying AMQP Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/AMQP/TIB_bwpluginamqp_6.0.1_v5_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginamqp_6.0.1_v5_bwce-runtime.zip || true\n        elif [ $pluginName == 'Kafka' ]; then\n            echo 'BWCE-AWS: Copying Kafka Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/Kafka/TIB_bwpluginkafka_6.0.0_v16.2_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginkafka_6.0.0_v16.2_bwce-runtime.zip || true\n        elif [ $pluginName == 'S3' ]; then\n            echo 'BWCE-AWS: Copying S3 Plugin Runtime...'\n            cp /home/ec2-user/bwce/installers/plugins/S3/TIB_bwpluginawss3_6.0.0_v9.3_bwce-runtime.zip /home/ec2-user/bwce/bwce-docker/resources/addons/plugins/TIB_bwpluginawss3_6.0.0_v9.3_bwce-runtime.zip || true\n        fi\n    done\nelse \n    echo 'BWCE-AWS: List of Plug-ins not provided...'\nfi\n\n$( aws ecr get-login --region ${AWS::Region} --no-include-email )\nif aws ecr describe-repositories --region ${AWS::Region} --repository-names ${EcrRepoName} | grep repositoryUri; then\n    echo 'BWCE-AWS: Repository already exists, skipping repository creation...'\nelse\n    aws ecr create-repository --region ${AWS::Region} --repository-name ${EcrRepoName}\nfi\nchmod +x /home/ec2-user/bwce/bwce-docker/createDockerImage.sh\ncd /home/ec2-user/bwce/bwce-docker/\nrm -f /home/ec2-user/bwce/bwce-docker/resources/bwce-runtime/bwceruntime-aws-2.3.1.zip\n./createDockerImage.sh /home/ec2-user/bwce/bwce-runtime/bwceruntime-aws-2.3.1.zip ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrRepoName}:2.3.1\ndocker push ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrRepoName}:2.3.1\n\nif [ ${ExtBucket} == 'Yes' ]; then\n    if aws s3api get-bucket-location --bucket ${ExtBucketName} | grep LocationConstraint; then\n        echo 'BWCE-AWS: S3 Bucket already exists, skipping bucket creation...'\n    else \n        aws s3api create-bucket --bucket ${ExtBucketName} --region ${AWS::Region}\n    fi\n    aws s3api put-object --bucket ${ExtBucketName} --key certs/\n    aws s3api put-object --bucket ${ExtBucketName} --key jars/\n    aws s3api put-object --bucket ${ExtBucketName} --key lib/\n    aws s3api put-object --bucket ${ExtBucketName} --key monitor-agents/\n    aws s3api put-object --bucket ${ExtBucketName} --key plugins/\n    aws s3api put-object --bucket ${ExtBucketName} --key thirdparty-installs/\nfi\necho 'BWCE-AWS: End of EC2 Instance UserData execution, shutting down...'\nsudo poweroff\n"
                   }
               }
           }
@@ -827,7 +846,7 @@
           "ECR": {
               "Description": "A reference to the Amazon ECR (Amazon EC2 Container Registry).",
               "Value": {
-                  "Fn::Sub": "https://console.aws.amazon.com/ecs/home?region=${AWS::Region}#/repositories/tibco-bwce#images"
+                  "Fn::Sub": "https://console.aws.amazon.com/ecs/home?region=${AWS::Region}#/repositories/${EcrRepoName}#images"
               }
           },
           "S3Bucket": {
