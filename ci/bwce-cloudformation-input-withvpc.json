@@ -1,15 +1,12 @@
 [{
-    "ParameterKey": "KeyPair",
+    "ParameterKey": "KeyName",
     "ParameterValue": "BWCE_Keypair"
 }, {
     "ParameterKey": "InstanceType",
     "ParameterValue": "t2.medium"
 }, {
-    "ParameterKey": "AvailablityZones",
-    "ParameterValue": "$[taskcat_genaz_2]"
-}, {
     "ParameterKey": "ClusterSize",
-    "ParameterValue": 2
+    "ParameterValue": "2"
 }, {
     "ParameterKey": "InstanceTypeStudioImage",
     "ParameterValue": "m3.large"
@@ -28,6 +25,7 @@
 }, {
     "ParameterKey": "PluginList",
     "ParameterValue": "DC"
-}
-
-]
+}, {
+    "ParameterKey": "ExtBucketName",
+    "ParameterValue": "taskcatbucket"
+}]
