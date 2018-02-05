@@ -1,0 +1,33 @@
+[{
+    "ParameterKey": "KeyPair",
+    "ParameterValue": "BWCE_Keypair"
+}, {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t2.medium"
+}, {
+    "ParameterKey": "AvailablityZones",
+    "ParameterValue": "$[taskcat_genaz_2]"
+}, {
+    "ParameterKey": "ClusterSize",
+    "ParameterValue": 2
+}, {
+    "ParameterKey": "InstanceTypeStudioImage",
+    "ParameterValue": "m3.large"
+}, {
+    "ParameterKey": "VolSize",
+    "ParameterValue": "30"
+}, {
+    "ParameterKey": "VolSizeStudioImage",
+    "ParameterValue": "40"
+}, {
+    "ParameterKey": "EcrRepoName",
+    "ParameterValue": "taskcatrepo"
+}, {
+    "ParameterKey": "ExtBucket",
+    "ParameterValue": "No"
+}, {
+    "ParameterKey": "PluginList",
+    "ParameterValue": "DC"
+}
+
+]

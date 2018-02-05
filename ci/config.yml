@@ -1,0 +1,14 @@
+global:
+  owner: crmadrig@tibco.com
+  qsname: BWCE-cf-quickstart
+  #s3bucket: projectx-templates <- (Optional) Only needed if you want to use a specific bucket
+  regions:
+    - us-east-1
+    - us-east-2
+    - us-west-1
+    - us-west-2
+tests:
+  # The following test will test in both us-west-1 and us-east-1 using sample-cloudformation-input.json as inputs
+scenario-all-regions:
+    parameter_input: bwce-cloudformation-input-withvpc.json
+    template_file: bwce-cloudformation-project-withvpc.template
