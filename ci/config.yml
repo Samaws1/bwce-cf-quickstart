@@ -4,11 +4,13 @@ global:
   #s3bucket: projectx-templates <- (Optional) Only needed if you want to use a specific bucket
   regions:
     - us-east-1
+    - us-east-2
   reporting: true
 tests:
-  # The following test will test in both us-west-1 and us-east-1 using sample-cloudformation-input.json as inputs
+  # The following test will test in us-east-1 and us-east-2 using sample-cloudformation-input.json as inputs
   taskcat-test1:
     parameter_input: bwce-cloudformation-input-withvpc.json
     regions:
       - us-east-1
+      - us-east-2
     template_file: bwce-cloudformation-project-withvpc.template
