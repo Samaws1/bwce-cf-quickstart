@@ -690,7 +690,7 @@
             "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
             "Properties": {
                 "Name": {
-                    "Fn::Sub": "${AWS::StackName}-default"
+                    "Fn::Sub": "${AWS::StackName}"
                 },
                 "VpcId": {
                     "Ref": "VPC"
@@ -1012,9 +1012,6 @@
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "Path": "/",
-                "RoleName": {
-                    "Fn::Sub": "${AWS::StackName}-ECSRole-${AWS::Region}"
-                },
                 "AssumeRolePolicyDocument": "{\n    \"Statement\": [{\n        \"Action\": \"sts:AssumeRole\",\n        \"Effect\": \"Allow\",\n        \"Principal\": { \n            \"Service\": \"ec2.amazonaws.com\" \n        }\n    }]\n}\n",
                 "Policies": [
                     {

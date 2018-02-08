@@ -1,0 +1,121 @@
+-----------------------------------------------------------------------------
+Region: us-east-1
+StackName: tCaT-tag-scenario-1-736b427c
+*****************************************************************************
+ResourceStatusReason:  
+Stack launch was successful
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                               LogicalResourceId                    ResourceStatusReason
+--------------------------------  ------------------  -----------------------------------------  -----------------------------------  ---------------------------------------------------------
+2018-02-08 18:22:46.574000+00:00  CREATE_COMPLETE     AWS::CloudFormation::Stack                 tCaT-tag-scenario-1-736b427c
+2018-02-08 18:22:43.430000+00:00  CREATE_COMPLETE     AWS::AutoScaling::AutoScalingGroup         ECSAutoScalingGroup
+2018-02-08 18:22:42.265000+00:00  CREATE_IN_PROGRESS  AWS::AutoScaling::AutoScalingGroup         ECSAutoScalingGroup                  Received SUCCESS signal with UniqueId i-0314b9409eb5c553f
+2018-02-08 18:22:34.266000+00:00  CREATE_COMPLETE     AWS::EC2::Route                            DefaultPrivateRoute1
+2018-02-08 18:22:19.575000+00:00  CREATE_COMPLETE     AWS::EC2::Route                            DefaultPrivateRoute2
+2018-02-08 18:22:18.667000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPrivateRoute1                 Resource creation Initiated
+2018-02-08 18:22:18.029000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPrivateRoute1
+2018-02-08 18:22:14.281000+00:00  CREATE_COMPLETE     AWS::EC2::NatGateway                       NatGateway1
+2018-02-08 18:22:06.234000+00:00  CREATE_COMPLETE     AWS::EC2::Instance                         FirstEC2Instance
+2018-02-08 18:22:04.001000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPrivateRoute2                 Resource creation Initiated
+2018-02-08 18:22:03.482000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPrivateRoute2
+2018-02-08 18:21:59.351000+00:00  CREATE_COMPLETE     AWS::ElasticLoadBalancingV2::Listener      LoadBalancerListener
+2018-02-08 18:21:58.913000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::Listener      LoadBalancerListener                 Resource creation Initiated
+2018-02-08 18:21:58.429000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::Listener      LoadBalancerListener
+2018-02-08 18:21:58.199000+00:00  CREATE_COMPLETE     AWS::EC2::NatGateway                       NatGateway2
+2018-02-08 18:21:54.229000+00:00  CREATE_COMPLETE     AWS::ElasticLoadBalancingV2::LoadBalancer  LoadBalancer
+2018-02-08 18:21:39.783000+00:00  CREATE_IN_PROGRESS  AWS::AutoScaling::AutoScalingGroup         ECSAutoScalingGroup                  Resource creation Initiated
+2018-02-08 18:21:38.476000+00:00  CREATE_IN_PROGRESS  AWS::AutoScaling::AutoScalingGroup         ECSAutoScalingGroup
+2018-02-08 18:21:34.292000+00:00  CREATE_COMPLETE     AWS::AutoScaling::LaunchConfiguration      ECSLaunchConfiguration
+2018-02-08 18:21:33.990000+00:00  CREATE_IN_PROGRESS  AWS::AutoScaling::LaunchConfiguration      ECSLaunchConfiguration               Resource creation Initiated
+2018-02-08 18:21:33.658000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance                         FirstEC2Instance                     Resource creation Initiated
+2018-02-08 18:21:32.806000+00:00  CREATE_IN_PROGRESS  AWS::AutoScaling::LaunchConfiguration      ECSLaunchConfiguration
+2018-02-08 18:21:32.363000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance                         FirstEC2Instance
+2018-02-08 18:21:28.511000+00:00  CREATE_COMPLETE     AWS::IAM::InstanceProfile                  ECSInstanceProfile
+2018-02-08 18:20:10.356000+00:00  CREATE_COMPLETE     AWS::EC2::Instance                         StudioEC2Instance
+2018-02-08 18:20:10.220000+00:00  CREATE_IN_PROGRESS  AWS::EC2::NatGateway                       NatGateway1                          Resource creation Initiated
+2018-02-08 18:20:09.952000+00:00  CREATE_IN_PROGRESS  AWS::EC2::NatGateway                       NatGateway2                          Resource creation Initiated
+2018-02-08 18:20:09.705000+00:00  CREATE_IN_PROGRESS  AWS::EC2::NatGateway                       NatGateway1
+2018-02-08 18:20:09.472000+00:00  CREATE_IN_PROGRESS  AWS::EC2::NatGateway                       NatGateway2
+2018-02-08 18:20:08.300000+00:00  CREATE_COMPLETE     AWS::EC2::SubnetRouteTableAssociation      PublicSubnet2RouteTableAssociation
+2018-02-08 18:20:07.431000+00:00  CREATE_COMPLETE     AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet2RouteTableAssociation
+2018-02-08 18:20:07.372000+00:00  CREATE_COMPLETE     AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet1RouteTableAssociation
+2018-02-08 18:20:07.052000+00:00  CREATE_COMPLETE     AWS::EC2::SubnetRouteTableAssociation      PublicSubnet1RouteTableAssociation
+2018-02-08 18:20:06.702000+00:00  CREATE_COMPLETE     AWS::EC2::EIP                              NatGateway1EIP
+2018-02-08 18:20:06.341000+00:00  CREATE_COMPLETE     AWS::EC2::Route                            DefaultPublicRoute
+2018-02-08 18:20:06.031000+00:00  CREATE_COMPLETE     AWS::EC2::EIP                              NatGateway2EIP
+2018-02-08 18:19:52.743000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PublicSubnet2RouteTableAssociation   Resource creation Initiated
+2018-02-08 18:19:52.589000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance                         StudioEC2Instance                    Resource creation Initiated
+2018-02-08 18:19:52.508000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::LoadBalancer  LoadBalancer                         Resource creation Initiated
+2018-02-08 18:19:51.783000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PublicSubnet2RouteTableAssociation
+2018-02-08 18:19:51.599000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet2RouteTableAssociation  Resource creation Initiated
+2018-02-08 18:19:51.556000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet1RouteTableAssociation  Resource creation Initiated
+2018-02-08 18:19:51.477000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::LoadBalancer  LoadBalancer
+2018-02-08 18:19:51.396000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PublicSubnet1RouteTableAssociation   Resource creation Initiated
+2018-02-08 18:19:51.196000+00:00  CREATE_IN_PROGRESS  AWS::EC2::EIP                              NatGateway1EIP                       Resource creation Initiated
+2018-02-08 18:19:51.104000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance                         StudioEC2Instance
+2018-02-08 18:19:50.783000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet2RouteTableAssociation
+2018-02-08 18:19:50.768000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PrivateSubnet1RouteTableAssociation
+2018-02-08 18:19:50.676000+00:00  CREATE_IN_PROGRESS  AWS::EC2::EIP                              NatGateway1EIP
+2018-02-08 18:19:50.629000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPublicRoute                   Resource creation Initiated
+2018-02-08 18:19:50.496000+00:00  CREATE_IN_PROGRESS  AWS::EC2::EIP                              NatGateway2EIP                       Resource creation Initiated
+2018-02-08 18:19:50.371000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SubnetRouteTableAssociation      PublicSubnet1RouteTableAssociation
+2018-02-08 18:19:50.005000+00:00  CREATE_IN_PROGRESS  AWS::EC2::EIP                              NatGateway2EIP
+2018-02-08 18:19:49.849000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Route                            DefaultPublicRoute
+2018-02-08 18:19:47.992000+00:00  CREATE_COMPLETE     AWS::EC2::Subnet                           PrivateSubnet2
+2018-02-08 18:19:47.708000+00:00  CREATE_COMPLETE     AWS::EC2::Subnet                           PublicSubnet2
+2018-02-08 18:19:47.684000+00:00  CREATE_COMPLETE     AWS::EC2::Subnet                           PublicSubnet1
+2018-02-08 18:19:47.500000+00:00  CREATE_COMPLETE     AWS::EC2::Subnet                           PrivateSubnet1
+2018-02-08 18:19:47.149000+00:00  CREATE_COMPLETE     AWS::EC2::VPCGatewayAttachment             InternetGatewayAttachment
+2018-02-08 18:19:38.566000+00:00  CREATE_COMPLETE     AWS::EC2::SecurityGroup                    ECSHostSecurityGroup
+2018-02-08 18:19:37.045000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    ECSHostSecurityGroup                 Resource creation Initiated
+2018-02-08 18:19:36.265000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    ECSHostSecurityGroup
+2018-02-08 18:19:33.174000+00:00  CREATE_COMPLETE     AWS::ElasticLoadBalancingV2::TargetGroup   DefaultTargetGroup
+2018-02-08 18:19:32.963000+00:00  CREATE_COMPLETE     AWS::EC2::RouteTable                       PublicRouteTable
+2018-02-08 18:19:32.897000+00:00  CREATE_COMPLETE     AWS::EC2::SecurityGroup                    LoadBalancerSecurityGroup
+2018-02-08 18:19:32.618000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::TargetGroup   DefaultTargetGroup                   Resource creation Initiated
+2018-02-08 18:19:32.549000+00:00  CREATE_COMPLETE     AWS::EC2::RouteTable                       PrivateRouteTable1
+2018-02-08 18:19:32.529000+00:00  CREATE_COMPLETE     AWS::EC2::SecurityGroup                    EC2SecurityGroup
+2018-02-08 18:19:31.788000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PublicRouteTable                     Resource creation Initiated
+2018-02-08 18:19:31.724000+00:00  CREATE_IN_PROGRESS  AWS::ElasticLoadBalancingV2::TargetGroup   DefaultTargetGroup
+2018-02-08 18:19:31.677000+00:00  CREATE_COMPLETE     AWS::EC2::RouteTable                       PrivateRouteTable2
+2018-02-08 18:19:31.652000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    LoadBalancerSecurityGroup            Resource creation Initiated
+2018-02-08 18:19:31.637000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PrivateSubnet2                       Resource creation Initiated
+2018-02-08 18:19:31.481000+00:00  CREATE_IN_PROGRESS  AWS::EC2::VPCGatewayAttachment             InternetGatewayAttachment            Resource creation Initiated
+2018-02-08 18:19:31.464000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PublicSubnet2                        Resource creation Initiated
+2018-02-08 18:19:31.425000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PrivateSubnet1                       Resource creation Initiated
+2018-02-08 18:19:31.358000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PrivateRouteTable1                   Resource creation Initiated
+2018-02-08 18:19:31.256000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    EC2SecurityGroup                     Resource creation Initiated
+2018-02-08 18:19:31.111000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PrivateSubnet2
+2018-02-08 18:19:30.998000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PublicRouteTable
+2018-02-08 18:19:30.992000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PublicSubnet1                        Resource creation Initiated
+2018-02-08 18:19:30.954000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    LoadBalancerSecurityGroup
+2018-02-08 18:19:30.832000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PrivateSubnet1
+2018-02-08 18:19:30.773000+00:00  CREATE_IN_PROGRESS  AWS::EC2::VPCGatewayAttachment             InternetGatewayAttachment
+2018-02-08 18:19:30.717000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PrivateRouteTable1
+2018-02-08 18:19:30.701000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PublicSubnet2
+2018-02-08 18:19:30.589000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PrivateRouteTable2                   Resource creation Initiated
+2018-02-08 18:19:30.503000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Subnet                           PublicSubnet1
+2018-02-08 18:19:30.301000+00:00  CREATE_IN_PROGRESS  AWS::EC2::SecurityGroup                    EC2SecurityGroup
+2018-02-08 18:19:30.208000+00:00  CREATE_IN_PROGRESS  AWS::EC2::RouteTable                       PrivateRouteTable2
+2018-02-08 18:19:28.146000+00:00  CREATE_COMPLETE     AWS::EC2::VPC                              VPC
+2018-02-08 18:19:27.974000+00:00  CREATE_IN_PROGRESS  AWS::IAM::InstanceProfile                  ECSInstanceProfile                   Resource creation Initiated
+2018-02-08 18:19:27.667000+00:00  CREATE_IN_PROGRESS  AWS::IAM::InstanceProfile                  ECSInstanceProfile
+2018-02-08 18:19:25.221000+00:00  CREATE_COMPLETE     AWS::IAM::Role                             ECSRole
+2018-02-08 18:19:25.076000+00:00  CREATE_COMPLETE     AWS::EC2::InternetGateway                  InternetGateway
+2018-02-08 18:19:10.676000+00:00  CREATE_IN_PROGRESS  AWS::EC2::VPC                              VPC                                  Resource creation Initiated
+2018-02-08 18:19:09.714000+00:00  CREATE_IN_PROGRESS  AWS::EC2::VPC                              VPC
+2018-02-08 18:19:09.117000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                             ECSRole                              Resource creation Initiated
+2018-02-08 18:19:08.894000+00:00  CREATE_COMPLETE     AWS::ECS::Cluster                          ECSCluster
+2018-02-08 18:19:08.880000+00:00  CREATE_IN_PROGRESS  AWS::EC2::InternetGateway                  InternetGateway                      Resource creation Initiated
+2018-02-08 18:19:08.685000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                             ECSRole
+2018-02-08 18:19:08.583000+00:00  CREATE_IN_PROGRESS  AWS::ECS::Cluster                          ECSCluster                           Resource creation Initiated
+2018-02-08 18:19:08.430000+00:00  CREATE_IN_PROGRESS  AWS::EC2::InternetGateway                  InternetGateway
+2018-02-08 18:19:07.954000+00:00  CREATE_IN_PROGRESS  AWS::ECS::Cluster                          ECSCluster
+2018-02-08 18:19:03.780000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack                 tCaT-tag-scenario-1-736b427c         User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Thursday, 08. February 2018 06:24PM
+-----------------------------------------------------------------------------
+
