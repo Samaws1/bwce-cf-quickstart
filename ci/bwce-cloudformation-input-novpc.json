@@ -1,0 +1,49 @@
+[{
+    "ParameterKey": "VPCID",
+    "ParameterValue": ""
+}, {
+    "ParameterKey": "VPCCIDR",
+    "ParameterValue": ""
+}, {
+    "ParameterKey": "PrivateSubnet1ID",
+    "ParameterValue": ""
+}, {
+    "ParameterKey": "PrivateSubnet2ID",
+    "ParameterValue": ""
+}, {
+    "ParameterKey": "PublicSubnet1ID",
+    "ParameterValue": ""
+},  {
+    "ParameterKey": "PublicSubnet2ID",
+    "ParameterValue": ""
+},  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "BWCE_Keypair"
+}, {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t2.medium"
+}, {
+    "ParameterKey": "ClusterSize",
+    "ParameterValue": "2"
+}, {
+    "ParameterKey": "InstanceTypeStudioImage",
+    "ParameterValue": "m3.large"
+}, {
+    "ParameterKey": "VolSize",
+    "ParameterValue": "30"
+}, {
+    "ParameterKey": "VolSizeStudioImage",
+    "ParameterValue": "40"
+}, {
+    "ParameterKey": "EcrRepoName",
+    "ParameterValue": "$[taskcat_random-string]"
+}, {
+    "ParameterKey": "ExtBucket",
+    "ParameterValue": "No"
+}, {
+    "ParameterKey": "PluginList",
+    "ParameterValue": "DC"
+}, {
+    "ParameterKey": "ExtBucketName",
+    "ParameterValue": "$[taskcat_random-string]"
+}]
